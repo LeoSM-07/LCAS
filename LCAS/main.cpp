@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <vector>
+#include <string>
 
 class Expr {
 public:
@@ -14,6 +15,7 @@ public:
 
     virtual Expr* simplify() = 0;
     virtual Expr* copy() = 0;
+    virtual bool equalStruct(Expr* other) = 0;
     virtual void print() = 0;
 
     void println() {
@@ -39,6 +41,18 @@ public:
         return new Num(value);
     }
 
+    bool equalStruct(Expr* other) override {
+        Num* otherNum = dynamic_cast<Num*>(other);
+
+        if (otherNum) {
+            // If 'other' is also a Num, compare their values
+            return this->value == otherNum->value;
+        }
+
+        // If 'other' is not a Num, their structures are not equal
+        return false;
+    }
+
     void print() override {
         std::cout << value;
     }
@@ -54,22 +68,45 @@ public:
     }
 
     Expr* simplify() override {
-        if (subExpr.size() != 2) {
-            // Invalid sum expression, return as is
-            return this;
+        Expr* toBeSimplified = copy();
+
+        addIntegers(dynamic_cast<Sum*>(toBeSimplified));
+        toBeSimplified = alone(dynamic_cast<Sum*>(toBeSimplified));
+
+        return toBeSimplified;
+    }
+
+    void addIntegers(Sum* sum) {
+        // Pre checks for optimization
+        int numCount = 0;
+        for (Expr* sub : subExpr) {
+            if(Num* expr = dynamic_cast<Num*>(sub)) numCount++;
+            if (numCount > 0) break;
         }
 
-        Expr* simplifiedLeft = subExpr[0]->simplify();
-        Expr* simplifiedRight = subExpr[1]->simplify();
+        if (numCount == 0) return;
 
-        // If both sub-expressions are numerical, evaluate the sum
-        if (dynamic_cast<Num*>(simplifiedLeft) && dynamic_cast<Num*>(simplifiedRight)) {
-            int sum = dynamic_cast<Num*>(simplifiedLeft)->value + dynamic_cast<Num*>(simplifiedRight)->value;
-            return new Num(sum);
+        int total = 0;
+        for (int i = 0; i < sum->subExpr.size(); i++) {
+            Num* expr = dynamic_cast<Num*>(sum->subExpr[i]);
+
+            if (expr) {
+                total = total + expr->value;
+                sum->subExpr.erase(sum->subExpr.begin()+i);
+                i--;
+            }
         }
 
-        Sum* simplifiedSum = new Sum(simplifiedLeft, simplifiedRight);
-        return simplifiedSum;
+        if (total != 0) sum->subExpr.push_back(new Num(total));
+    }
+
+    Expr* alone(Sum* sum) {
+        if (sum->subExpr.size() == 1) {
+            return sum->subExpr[0];
+        } else if (sum->subExpr.size() == 0) {
+            return new Num(0);
+        }
+        return sum;
     }
 
     Expr* copy() override {
@@ -80,17 +117,151 @@ public:
         return copySum;
     }
 
-    void print() override {
-        if (subExpr.size() != 2) {
-            // Invalid sum expression, print as is
-            std::cout << "Invalid Sum Expression";
-            return;
+    bool equalStruct(Expr* other) override {
+        // Check if 'other' is of the same type as Sum
+        Sum* otherSum = dynamic_cast<Sum*>(other);
+
+        if (otherSum) {
+            // If 'other' is also a Sum, compare their sub-expressions
+            return this->subExpr.size() == otherSum->subExpr.size() &&
+                   this->subExpr[0]->equalStruct(otherSum->subExpr[0]) &&
+                   this->subExpr[1]->equalStruct(otherSum->subExpr[1]);
         }
 
-        subExpr[0]->print();
-        std::cout << " + ";
-        subExpr[1]->print();
+        // If 'other' is not a Sum, their structures are not equal
+        return false;
+    }
 
+    void print() override {
+        for (int i = 0; i < subExpr.size(); i++) {
+            Expr* sub = dynamic_cast<Expr*>(subExpr[i]);
+
+            if (sub) {
+                subExpr.at(i)->print();
+                if (i != (subExpr.size()-1)) std::cout << " + ";
+            }
+        }
+    }
+
+};
+
+class Var: public Expr {
+public:
+    std::string name;
+
+    Var(std::string identifier): name(identifier) { }
+
+    Expr* simplify() override {
+        // Nothing to simplify here
+        return this;
+    }
+
+    Expr* copy() override {
+        return new Var(name);
+    }
+
+    bool equalStruct(Expr* other) override {
+        Var* otherVar = dynamic_cast<Var*>(other);
+
+        if (otherVar) {
+            // If 'other' is also a Var, compare their values
+            return this->name == otherVar->name;
+        }
+
+        // If 'other' is not a Var, their structures are not equal
+        return false;
+    }
+
+    void print() override {
+        std::cout << name;
+    }
+
+};
+
+class Prod: public Expr {
+public:
+    Prod() { }
+    Prod(Expr* first, Expr* second) {
+        subExpr.push_back(first);
+        subExpr.push_back(second);
+    }
+
+    Expr* simplify() override {
+        Expr* toBeSimplified = copy();
+
+        multiplyIntegers(dynamic_cast<Prod*>(toBeSimplified));
+        toBeSimplified = alone(dynamic_cast<Prod*>(toBeSimplified));
+        return toBeSimplified;
+    }
+
+    void multiplyIntegers(Prod* prod) {
+        // Check to see if there are enough Num to multiply
+        int numCount = 0;
+        for (Expr* sub : subExpr) {
+            if(Num* expr = dynamic_cast<Num*>(sub)) numCount++;
+            if (numCount > 0) break;
+        }
+
+        if (numCount < 1) return;
+
+        // Preform the operation if there are enough numbers
+
+        int total = 1;
+
+        for (int i = 0; i < prod->subExpr.size(); i++) {
+            Num* expr = dynamic_cast<Num*>(prod->subExpr[i]);
+
+            if (expr) {
+                total = total * expr->value;
+                prod->subExpr.erase(prod->subExpr.begin()+i);
+                i--;
+            }
+        }
+
+        if(total != 1) prod->subExpr.push_back(new Num(total));
+
+    }
+
+    Expr* alone(Prod* prod) {
+        // if the product has only 1 element
+        if (prod->subExpr.size() == 1) {
+            return prod->subExpr[0];
+        // if the product is empty, return 1
+        } else if (prod->subExpr.size() == 0) {
+            return new Num(1);
+        }
+        return prod;
+    }
+
+    Expr* copy() override {
+        Expr* prodCopy = new Prod();
+        
+        for (Expr* sub : subExpr) {
+            prodCopy->subExpr.push_back(sub->copy());
+        }
+
+        return prodCopy;
+    }
+
+    bool equalStruct(Expr* other) override {
+        // Check if 'other' is of the same type as Prod
+        Prod* otherProd = dynamic_cast<Prod*>(other);
+
+        if (otherProd) {
+            return this->subExpr.size() == otherProd->subExpr.size() &&
+                   this->subExpr[0]->equalStruct(otherProd->subExpr[0]) &&
+                   this->subExpr[1]->equalStruct(otherProd->subExpr[1]);
+        }
+
+        return false;
+    }
+
+    void print() override {
+        for (int i = 0; i < subExpr.size(); i++) {
+            subExpr[i]->print();
+            if (i != (subExpr.size()-1))
+                std::cout << " * ";
+        }
     }
 
 };
@@ -99,16 +270,23 @@ int main(int argc, const char * argv[]) {
     // insert code here...
     std::cout << "Hello, World!\n";
 
-    Num num1(2);
-    Num num2(23);
-    Sum sumExpr(&num1, &num2);
+    Sum sumExpr(new Num(1), new Num(5));
+    Expr* result;
 
-    Expr* result = sumExpr.simplify();
+    result = sumExpr.simplify();
 
-    sumExpr.print();  // Output: 20 + 22
+    sumExpr.print();
     std::cout << " = ";
-    result->print();  // Output: 42
-    std::cout << "\n";
+    result->print();
+    std::cout << std::endl;
+
+    Prod prodExpr(new Num(3), new Num(5));
+    result = prodExpr.simplify();
+
+    prodExpr.print();
+    std::cout << " = ";
+    result->print();
+    std::cout << std::endl;
 
 
     return 0;
