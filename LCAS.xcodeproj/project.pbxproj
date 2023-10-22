@@ -8,6 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		42358ED52AE57D9500DF1316 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 42358ED42AE57D9500DF1316 /* main.cpp */; };
+		42F18F432AE5CA080013DEBB /* Num.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 42F18F422AE5CA080013DEBB /* Num.cpp */; };
+		42F18F462AE5CA5B0013DEBB /* Prod.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 42F18F442AE5CA5B0013DEBB /* Prod.cpp */; };
+		42F18F492AE5CB8C0013DEBB /* Sum.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 42F18F472AE5CB8C0013DEBB /* Sum.cpp */; };
+		42F18F4C2AE5CD1F0013DEBB /* Power.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 42F18F4A2AE5CD1F0013DEBB /* Power.cpp */; };
+		42F18F4F2AE5CDE00013DEBB /* Var.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 42F18F4D2AE5CDE00013DEBB /* Var.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +30,17 @@
 /* Begin PBXFileReference section */
 		42358ED12AE57D9500DF1316 /* LCAS */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LCAS; sourceTree = BUILT_PRODUCTS_DIR; };
 		42358ED42AE57D9500DF1316 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		42F18F402AE5C8F80013DEBB /* Expr.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Expr.hpp; sourceTree = "<group>"; };
+		42F18F412AE5C94D0013DEBB /* Num.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Num.hpp; sourceTree = "<group>"; };
+		42F18F422AE5CA080013DEBB /* Num.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Num.cpp; sourceTree = "<group>"; };
+		42F18F442AE5CA5B0013DEBB /* Prod.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Prod.cpp; sourceTree = "<group>"; };
+		42F18F452AE5CA5B0013DEBB /* Prod.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Prod.hpp; sourceTree = "<group>"; };
+		42F18F472AE5CB8C0013DEBB /* Sum.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Sum.cpp; sourceTree = "<group>"; };
+		42F18F482AE5CB8C0013DEBB /* Sum.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Sum.hpp; sourceTree = "<group>"; };
+		42F18F4A2AE5CD1F0013DEBB /* Power.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Power.cpp; sourceTree = "<group>"; };
+		42F18F4B2AE5CD1F0013DEBB /* Power.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Power.hpp; sourceTree = "<group>"; };
+		42F18F4D2AE5CDE00013DEBB /* Var.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Var.cpp; sourceTree = "<group>"; };
+		42F18F4E2AE5CDE00013DEBB /* Var.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Var.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +74,17 @@
 			isa = PBXGroup;
 			children = (
 				42358ED42AE57D9500DF1316 /* main.cpp */,
+				42F18F4D2AE5CDE00013DEBB /* Var.cpp */,
+				42F18F4E2AE5CDE00013DEBB /* Var.hpp */,
+				42F18F4A2AE5CD1F0013DEBB /* Power.cpp */,
+				42F18F4B2AE5CD1F0013DEBB /* Power.hpp */,
+				42F18F472AE5CB8C0013DEBB /* Sum.cpp */,
+				42F18F482AE5CB8C0013DEBB /* Sum.hpp */,
+				42F18F402AE5C8F80013DEBB /* Expr.hpp */,
+				42F18F412AE5C94D0013DEBB /* Num.hpp */,
+				42F18F422AE5CA080013DEBB /* Num.cpp */,
+				42F18F442AE5CA5B0013DEBB /* Prod.cpp */,
+				42F18F452AE5CA5B0013DEBB /* Prod.hpp */,
 			);
 			path = LCAS;
 			sourceTree = "<group>";
@@ -119,6 +146,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				42F18F462AE5CA5B0013DEBB /* Prod.cpp in Sources */,
+				42F18F4C2AE5CD1F0013DEBB /* Power.cpp in Sources */,
+				42F18F492AE5CB8C0013DEBB /* Sum.cpp in Sources */,
+				42F18F4F2AE5CDE00013DEBB /* Var.cpp in Sources */,
+				42F18F432AE5CA080013DEBB /* Num.cpp in Sources */,
 				42358ED52AE57D9500DF1316 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
