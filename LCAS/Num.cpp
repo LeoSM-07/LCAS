@@ -11,7 +11,7 @@
 #include <iostream>
 
 Num::Num(int val) : value(val) {
-    // Constructor implementation
+    getLatex();
 }
 
 Expr* Num::simplify() {
@@ -33,6 +33,10 @@ bool Num::equalStruct(Expr* other) {
 
     // If 'other' is not a Num, their structures are not equal
     return false;
+}
+
+std::string Num::getLatex() {
+    return std::to_string(this->value);
 }
 
 void Num::print() {

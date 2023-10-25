@@ -9,6 +9,7 @@
 #define Prod_hpp
 
 #include <stdio.h>
+#include <string.h>
 #include "Expr.hpp"
 
 class Prod : public Expr {
@@ -25,7 +26,8 @@ public:
     Expr* copy() override;
 
     bool equalStruct(Expr* other) override;
-
+    
+    std::string getLatex() override;
     void print() override;
 };
 

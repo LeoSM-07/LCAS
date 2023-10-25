@@ -10,6 +10,8 @@
 #include "Num.hpp"
 #include "Prod.hpp"
 
+#define LATEX_ADDITION_SIGN "+"
+
 class Prod;
 
 Sum::Sum(){};
@@ -25,6 +27,7 @@ Expr* Sum::simplify() {
     addLikeTerms((Sum*)toBeSimplified);
     addIntegers((Sum*)(toBeSimplified));
     toBeSimplified = alone((Sum*)(toBeSimplified));
+
 
     return toBeSimplified;
 }
@@ -140,6 +143,19 @@ bool Sum::equalStruct(Expr* other) {
 
     // If 'other' is not a Sum, their structures are not equal
     return false;
+}
+
+std::string Sum::getLatex() {
+    std::string latex = "";
+    for (int i = 0; i < subExpr.size(); i++) {
+        Expr* sub = (Expr*)subExpr[i];
+
+        if (sub) {
+            latex.append(subExpr[i]->getLatex());
+            if (i != (subExpr.size()-1)) latex.append(LATEX_ADDITION_SIGN);
+        }
+    }
+    return latex;
 }
 
 void Sum::print() {

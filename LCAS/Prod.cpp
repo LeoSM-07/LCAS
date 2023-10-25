@@ -6,16 +6,21 @@
 //
 
 #include <iostream>
+#include <vector>
 #include "Prod.hpp"
 #include "Num.hpp"
+#include "Var.hpp"
 #include "Power.hpp"
 #include "Sum.hpp"
+
+#define LATEX_MULTIPLICATION_SIGN "\\cdot "
 
 Prod::Prod() { }
 
 Prod::Prod(Expr* first, Expr* second) {
     subExpr.push_back(first);
     subExpr.push_back(second);
+    getLatex();
 }
 
 Expr* Prod::simplify() {
@@ -24,6 +29,8 @@ Expr* Prod::simplify() {
     multiplyLikeTerms((Prod*)toBeSimplified);
     multiplyIntegers((Prod*)toBeSimplified);
     toBeSimplified = alone((Prod*)toBeSimplified);
+//    toBeSimplified->setLatex();
+
     return toBeSimplified;
 }
 
@@ -126,6 +133,35 @@ bool Prod::equalStruct(Expr* other) {
     }
 
     return false;
+}
+
+std::string Prod::getLatex() {
+    std::vector<Num*> nums;
+    std::vector<Var*> vars;
+    std::string latex = "";
+
+    for (int i = 0; i < subExpr.size(); i++) {
+        if (dynamic_cast<Var*>(subExpr[i])) vars.push_back(dynamic_cast<Var*>(subExpr[i]));
+        else if (dynamic_cast<Num*>(subExpr[i])) nums.push_back(dynamic_cast<Num*>(subExpr[i]));
+    }
+
+    // Special ordering for single coefficients on variables
+    if (vars.size() == 1 && nums.size() == 1 && subExpr.size() == 2) {
+        for (Num* num : nums) {
+            latex.append(num->getLatex());
+        }
+        for (Var* var : vars) {
+            latex.append(var->getLatex());
+        }
+    } else {
+        for (int i = 0; i < subExpr.size(); i++) {
+            latex.append(subExpr[i]->getLatex());
+            if (i != (subExpr.size()-1))
+                latex.append(LATEX_MULTIPLICATION_SIGN);
+        }
+    }
+
+    return latex;
 }
 
 void Prod::print() {

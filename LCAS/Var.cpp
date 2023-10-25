@@ -9,7 +9,9 @@
 #include "Var.hpp"
 #include "Expr.hpp"
 
-Var::Var(std::string identifier): name(identifier) { }
+Var::Var(std::string identifier): name(identifier) {
+    getLatex();
+}
 
 Expr* Var::simplify() {
     // Nothing to simplify here
@@ -30,6 +32,10 @@ bool Var::equalStruct(Expr* other)  {
 
     // If 'other' is not a Var, their structures are not equal
     return false;
+}
+
+std::string Var::getLatex() {
+    return this->name;
 }
 
 void Var::print() {

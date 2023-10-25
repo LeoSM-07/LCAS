@@ -74,17 +74,17 @@
 			isa = PBXGroup;
 			children = (
 				42358ED42AE57D9500DF1316 /* main.cpp */,
-				42F18F4D2AE5CDE00013DEBB /* Var.cpp */,
 				42F18F4E2AE5CDE00013DEBB /* Var.hpp */,
-				42F18F4A2AE5CD1F0013DEBB /* Power.cpp */,
+				42F18F4D2AE5CDE00013DEBB /* Var.cpp */,
 				42F18F4B2AE5CD1F0013DEBB /* Power.hpp */,
-				42F18F472AE5CB8C0013DEBB /* Sum.cpp */,
+				42F18F4A2AE5CD1F0013DEBB /* Power.cpp */,
 				42F18F482AE5CB8C0013DEBB /* Sum.hpp */,
+				42F18F472AE5CB8C0013DEBB /* Sum.cpp */,
 				42F18F402AE5C8F80013DEBB /* Expr.hpp */,
 				42F18F412AE5C94D0013DEBB /* Num.hpp */,
 				42F18F422AE5CA080013DEBB /* Num.cpp */,
-				42F18F442AE5CA5B0013DEBB /* Prod.cpp */,
 				42F18F452AE5CA5B0013DEBB /* Prod.hpp */,
+				42F18F442AE5CA5B0013DEBB /* Prod.cpp */,
 			);
 			path = LCAS;
 			sourceTree = "<group>";

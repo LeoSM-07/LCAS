@@ -26,6 +26,8 @@ public:
 
     bool equalStruct(Expr* other) override;
 
+    std::string getLatex() override;
+
     void print() override;
 };
 

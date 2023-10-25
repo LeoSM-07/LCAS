@@ -41,6 +41,40 @@ bool Power::equalStruct(Expr* other) {
     return false;
 }
 
+std::string Power::getLatex() {
+    std::string latex = "";
+    // Rules to use paren on base/expo:
+    //  - Base is negative
+    //  - Base is a sum, product, or power
+    bool useParenthesisOnBase = false;
+    bool useParenthesisOnExpo = false;
+
+    if (dynamic_cast<Sum*>(getBase()) || dynamic_cast<Prod*>(getBase()) || dynamic_cast<Power*>(getBase())) useParenthesisOnBase = true;
+    if (dynamic_cast<Num*>(getBase())) {
+        Num* baseNum = dynamic_cast<Num*>(getBase());
+        if (baseNum->value < 0) useParenthesisOnBase = true;
+    }
+
+    if (useParenthesisOnBase) latex.append("(");
+    latex.append(getBase()->getLatex());
+    if (useParenthesisOnBase) latex.append(")");
+    latex.append("^");
+
+    if (dynamic_cast<Sum*>(getExpo()) || dynamic_cast<Prod*>(getExpo()) || dynamic_cast<Power*>(getExpo())) useParenthesisOnExpo = true;
+    if (dynamic_cast<Num*>(getExpo())) {
+        Num* baseNum = dynamic_cast<Num*>(getExpo());
+        if (baseNum->value < 0) useParenthesisOnExpo = true;
+    }
+
+    latex.append("{");
+    if (useParenthesisOnExpo) latex.append("(");
+    latex.append(getExpo()->getLatex());
+    if (useParenthesisOnExpo) latex.append(")");
+    latex.append("}");
+
+    return latex;
+}
+
 void Power::print() {
     // Rules to use paren on base/expo:
     //  - Base is negative
@@ -68,5 +102,4 @@ void Power::print() {
     if (useParenthesisOnBase) std::cout << "(";
     getExpo()->print();
     if (useParenthesisOnBase) std::cout << ")";
-
 }

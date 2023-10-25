@@ -19,6 +19,7 @@ public:
     virtual Expr* simplify() = 0;
     virtual Expr* copy() = 0;
     virtual bool equalStruct(Expr* other) = 0;
+    virtual std::string getLatex() = 0;
     virtual void print() = 0;
 
 };
