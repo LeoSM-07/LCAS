@@ -24,6 +24,7 @@ public:
 
     Expr* copy() override;
 
+    long generateHash() override;
     bool equalStruct(Expr* other) override;
 
     std::string getLatex() override;

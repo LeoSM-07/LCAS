@@ -11,7 +11,7 @@
 #include <iostream>
 
 Num::Num(int val) : value(val) {
-    getLatex();
+    simple = true;
 }
 
 Expr* Num::simplify() {
@@ -21,6 +21,10 @@ Expr* Num::simplify() {
 
 Expr* Num::copy() {
     return new Num(value);
+}
+
+long Num::generateHash() {
+    return value+2762923428917024652L;
 }
 
 bool Num::equalStruct(Expr* other) {

@@ -31,6 +31,8 @@ Expr* Sum::simplify() {
     toBeSimplified = alone((Sum*)(toBeSimplified));
 
 
+    toBeSimplified->simple = true;
+
     return toBeSimplified;
 }
 
@@ -132,6 +134,16 @@ Expr* Sum::copy() {
         copySum->push_back(sub->copy());
     }
     return copySum;
+}
+
+long Sum::generateHash() {
+    long sum = 1;
+    
+    for (int i = 0; i < size(); i++) {
+        sum += at(i)->generateHash();
+    }
+
+    return sum-926481637408623462L;
 }
 
 bool Sum::equalStruct(Expr* other) {

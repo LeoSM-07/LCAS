@@ -22,10 +22,12 @@ public:
     virtual Expr* simplify() = 0;
     virtual Expr* copy() = 0;
     virtual bool equalStruct(Expr* other) = 0;
+    virtual long generateHash() = 0;
     virtual std::string getLatex() = 0;
     virtual void print() = 0;
 
     void simplifyChildren();
+    void sort();
 
     void push_back(Expr* e);
 
@@ -40,8 +42,6 @@ public:
     size_t size();
 
     void clear();
-
-    void sort();
 };
 
 

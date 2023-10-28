@@ -10,7 +10,7 @@
 #include "Expr.hpp"
 
 Var::Var(std::string identifier): name(identifier) {
-    getLatex();
+    simple = true;
 }
 
 Expr* Var::simplify() {
@@ -20,6 +20,18 @@ Expr* Var::simplify() {
 
 Expr* Var::copy() {
     return new Var(name);
+}
+
+long Var::generateHash() {
+    long ex = 1;
+    long sum = 0;
+
+    for (int i = 0; i < name.length(); i++) {
+        sum += (name.at(i)-'0')*ex;
+        ex *= 63;
+    }
+
+    return sum;
 }
 
 bool Var::equalStruct(Expr* other)  {

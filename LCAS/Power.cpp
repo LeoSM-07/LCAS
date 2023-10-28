@@ -24,11 +24,20 @@ Power::Power (Expr* base, Expr* expo) {
 }
 
 Expr* Power::simplify() {
-    return nullptr;
+    Expr* toBeSimplified = copy();
+
+    toBeSimplified->simplifyChildren();
+    toBeSimplified->simple = true;
+
+    return toBeSimplified;
 }
 
 Expr* Power::copy() {
     return new Power(getBase()->copy(), getExpo()->copy());
+}
+
+long Power::generateHash() {
+    return (getBase()->generateHash()+87234*getExpo()->generateHash())-8176428751232101230L;
 }
 
 bool Power::equalStruct(Expr* other) {

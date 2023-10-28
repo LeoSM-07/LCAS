@@ -25,11 +25,15 @@ Prod::Prod(Expr* first, Expr* second) {
 
 Expr* Prod::simplify() {
     Expr* toBeSimplified = copy();
-    
+
+    toBeSimplified->simplifyChildren();
+
     multiplyLikeTerms((Prod*)toBeSimplified);
     multiplyIntegers((Prod*)toBeSimplified);
     toBeSimplified = alone((Prod*)toBeSimplified);
 //    toBeSimplified->setLatex();
+
+    toBeSimplified->simple = true;
 
     return toBeSimplified;
 }
@@ -96,7 +100,9 @@ void Prod::multiplyLikeTerms(Prod* prod) {
 
         if (found) {
             expo = expo->simplify();
-            prod->set(i, new Power(current, expo));
+            Expr* replacement = new Power(current, expo);
+            replacement->simplify();
+            prod->set(i, replacement);
         }
         
     }
@@ -124,9 +130,19 @@ Expr* Prod::copy() {
     return prodCopy;
 }
 
+long Prod::generateHash() {
+    long sum = 1;
+
+    for (int i = 0; i < size(); i++) {
+        sum += at(i)->generateHash();
+    }
+
+    return sum;
+}
+
 bool Prod::equalStruct(Expr* other) {
     // Check if 'other' is of the same type as Prod
-    Prod* otherProd = (Prod*)other;
+    Prod* otherProd = dynamic_cast<Prod*>(other);
 
     if (otherProd) {
         return this->size() == otherProd->size() &&
@@ -157,7 +173,11 @@ std::string Prod::getLatex() {
         }
     } else {
         for (int i = 0; i < size(); i++) {
+            bool useParenthesis = at(i)->size() > 1 && !dynamic_cast<Prod*>(at(i));
+            if (useParenthesis) latex.append("(");
             latex.append(at(i)->getLatex());
+            if (useParenthesis) latex.append(")");
+
             if (i != (size()-1))
                 latex.append(LATEX_MULTIPLICATION_SIGN);
         }

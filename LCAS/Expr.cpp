@@ -18,6 +18,20 @@ void Expr::simplifyChildren() {
             subExpr[i] = sub;
         }
     }
+
+    simple = true;
+}
+
+void Expr::sort() {
+    for (int i = 0; i < subExpr.size() - 1; i++) {
+        for (int j = 0; j < subExpr.size() - 2 - i; j++) {
+            if (subExpr[i]->generateHash() > subExpr[j + 1]->generateHash()) {
+                Expr* temp = subExpr[j];
+                subExpr[j] = subExpr[j + 1];
+                subExpr[j + 1] = temp;
+            }
+        }
+    }
 }
 
 void Expr::push_back(Expr* e) {
