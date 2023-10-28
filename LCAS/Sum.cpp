@@ -17,12 +17,14 @@ class Prod;
 Sum::Sum(){};
 
 Sum::Sum(Expr* leftExpr, Expr* rightExpr) {
-    subExpr.push_back(leftExpr);
-    subExpr.push_back(rightExpr);
+    push_back(leftExpr);
+    push_back(rightExpr);
 }
 
 Expr* Sum::simplify() {
     Expr* toBeSimplified = copy();
+
+    toBeSimplified->simplifyChildren();
 
     addLikeTerms((Sum*)toBeSimplified);
     addIntegers((Sum*)(toBeSimplified));
@@ -35,7 +37,8 @@ Expr* Sum::simplify() {
 void Sum::addIntegers(Sum* sum) {
     // Pre checks for optimization
     int numCount = 0;
-    for (Expr* sub : subExpr) {
+    for (int i = 0; i < size(); i++) {
+        Expr* sub = at(i);
         if(Num* expr = dynamic_cast<Num*>(sub)) numCount++;
         if (numCount > 0) break;
     }
@@ -43,32 +46,32 @@ void Sum::addIntegers(Sum* sum) {
     if (numCount == 0) return;
 
     int total = 0;
-    for (int i = 0; i < sum->subExpr.size(); i++) {
-        Num* expr = dynamic_cast<Num*>(sum->subExpr[i]);
+    for (int i = 0; i < sum->size(); i++) {
+        Num* expr = dynamic_cast<Num*>(sum->at(i));
 
         if (expr) {
             total = total + expr->value;
-            sum->subExpr.erase(sum->subExpr.begin()+i);
+            sum->erase(i);
             i--;
         }
     }
 
-    if (total != 0) sum->subExpr.push_back(new Num(total));
+    if (total != 0) sum->push_back(new Num(total));
 }
 
 void Sum::addLikeTerms(Sum* sum) {
-    for(int i = 0; i < sum->subExpr.size(); i++) {
-        Expr* current = sum->subExpr[i]->copy();
+    for(int i = 0; i < sum->size(); i++) {
+        Expr* current = sum->at(i)->copy();
         int coef = 1; // the coefficient
 
         // if the term is a product
         if (dynamic_cast<Prod*>(current)) {
             // loop over each part of the product
-            for(int j = 0; j < current->subExpr.size(); j++) {
+            for(int j = 0; j < current->size(); j++) {
                 // if the part is a number
-                if(dynamic_cast<Num*>(current->subExpr[j])) {
-                    coef = ((Num*)(current->subExpr[j]))->value;
-                    current->subExpr.erase(current->subExpr.begin()+j);
+                if(dynamic_cast<Num*>(current->at(j))) {
+                    coef = ((Num*)(current->at(j)))->value;
+                    current->erase(j);
                     current = current->simplify();
                     break;
                 }
@@ -76,16 +79,16 @@ void Sum::addLikeTerms(Sum* sum) {
         }
 
         bool foundSame = false;
-        for(int j = i+1; j < sum->subExpr.size(); j++) {
-            Expr* toComp = sum->subExpr[j]->copy();
+        for(int j = i+1; j < sum->size(); j++) {
+            Expr* toComp = sum->at(j)->copy();
             int toCompCoef = 1;
 
             if (dynamic_cast<Prod*>(toComp)) {
-                for(int k = 0; k < toComp->subExpr.size(); k++) {
-                    Expr* partOfProd = toComp->subExpr[k];
+                for(int k = 0; k < toComp->size(); k++) {
+                    Expr* partOfProd = toComp->at(k);
                     if (dynamic_cast<Num*>(partOfProd)) {
                         toCompCoef = ((Num*)partOfProd)->value;
-                        toComp->subExpr.erase(toComp->subExpr.begin()+k);
+                        toComp->erase(k);
                         toComp = toComp->simplify();
                         break;
                     }
@@ -93,7 +96,7 @@ void Sum::addLikeTerms(Sum* sum) {
             }
 
             if (current->equalStruct(toComp)) {
-                sum->subExpr.erase(sum->subExpr.begin()+j);
+                sum->erase(j);
                 j--;
                 foundSame = true;
                 coef = coef + toCompCoef;
@@ -102,21 +105,21 @@ void Sum::addLikeTerms(Sum* sum) {
 
         if (foundSame) {
             if (dynamic_cast<Prod*>(current)) {
-                current->subExpr.push_back(new Num(coef));
+                current->push_back(new Num(coef));
             } else {
                 current = new Prod(current, new Num(coef));
             }
 
             current = current->simplify();
-            sum->subExpr[i] = current;
+            sum->set(i, current);
         }
     }
 }
 
 Expr* Sum::alone(Sum* sum) {
-    if (sum->subExpr.size() == 1) {
-        return sum->subExpr[0];
-    } else if (sum->subExpr.size() == 0) {
+    if (sum->size() == 1) {
+        return sum->at(0);
+    } else if (sum->size() == 0) {
         return new Num(0);
     }
     return sum;
@@ -124,8 +127,9 @@ Expr* Sum::alone(Sum* sum) {
 
 Expr* Sum::copy() {
     Sum* copySum = new Sum();
-    for (Expr* sub : subExpr) {
-        copySum->subExpr.push_back(sub->copy());
+    for (int i = 0; i < size(); i++) {
+        Expr* sub = at(i);
+        copySum->push_back(sub->copy());
     }
     return copySum;
 }
@@ -136,9 +140,9 @@ bool Sum::equalStruct(Expr* other) {
 
     if (otherSum) {
         // If 'other' is also a Sum, compare their sub-expressions
-        return this->subExpr.size() == otherSum->subExpr.size() &&
-        this->subExpr[0]->equalStruct(otherSum->subExpr[0]) &&
-        this->subExpr[1]->equalStruct(otherSum->subExpr[1]);
+        return this->size() == otherSum->size() &&
+        this->at(0)->equalStruct(otherSum->at(0)) &&
+        this->at(1)->equalStruct(otherSum->at(1));
     }
 
     // If 'other' is not a Sum, their structures are not equal
@@ -147,24 +151,24 @@ bool Sum::equalStruct(Expr* other) {
 
 std::string Sum::getLatex() {
     std::string latex = "";
-    for (int i = 0; i < subExpr.size(); i++) {
-        Expr* sub = (Expr*)subExpr[i];
+    for (int i = 0; i < size(); i++) {
+        Expr* sub = (Expr*) at(i);
 
         if (sub) {
-            latex.append(subExpr[i]->getLatex());
-            if (i != (subExpr.size()-1)) latex.append(LATEX_ADDITION_SIGN);
+            latex.append(at(i)->getLatex());
+            if (i != (size()-1)) latex.append(LATEX_ADDITION_SIGN);
         }
     }
     return latex;
 }
 
 void Sum::print() {
-    for (int i = 0; i < subExpr.size(); i++) {
-        Expr* sub = (Expr*)subExpr[i];
+    for (int i = 0; i < size(); i++) {
+        Expr* sub = (Expr*) at(i);
 
         if (sub) {
-            subExpr.at(i)->print();
-            if (i != (subExpr.size()-1)) std::cout << " + ";
+            at(i)->print();
+            if (i != (size()-1)) std::cout << " + ";
         }
     }
 }

@@ -18,8 +18,8 @@
 Prod::Prod() { }
 
 Prod::Prod(Expr* first, Expr* second) {
-    subExpr.push_back(first);
-    subExpr.push_back(second);
+    push_back(first);
+    push_back(second);
     getLatex();
 }
 
@@ -37,7 +37,8 @@ Expr* Prod::simplify() {
 void Prod::multiplyIntegers(Prod* prod) {
     // Check to see if there are enough Num to multiply
     int numCount = 0;
-    for (Expr* sub : subExpr) {
+    for (int i = 0; i < size(); i++) {
+        Expr* sub = at(i);
         if(Num* expr = (Num*)sub) numCount++;
         if (numCount > 0) break;
     }
@@ -48,45 +49,45 @@ void Prod::multiplyIntegers(Prod* prod) {
 
     int total = 1;
 
-    for (int i = 0; i < prod->subExpr.size(); i++) {
-        Num* expr = dynamic_cast<Num*>(prod->subExpr[i]);
+    for (int i = 0; i < prod->size(); i++) {
+        Num* expr = dynamic_cast<Num*>(prod->at(i));
 
         if (expr) {
             total = total * expr->value;
-            prod->subExpr.erase(prod->subExpr.begin()+i);
+            prod->erase(i);
             i--;
         }
     }
 
-    if(total != 1) prod->subExpr.push_back(new Num(total));
+    if(total != 1) prod->push_back(new Num(total));
 }
 
 void Prod::multiplyLikeTerms(Prod* prod) {
-    for (int i = 0; i < prod->subExpr.size(); i++) {
-        Expr* current = prod->subExpr[i];
+    for (int i = 0; i < prod->size(); i++) {
+        Expr* current = prod->at(i);
         Expr* expo = new Sum();
 
         Power* currentPower = dynamic_cast<Power*>(current);
         if (currentPower) {
             current = currentPower->getBase();
-            expo->subExpr.push_back(currentPower->getExpo());
-        } else expo->subExpr.push_back(new Num(1));
+            expo->push_back(currentPower->getExpo());
+        } else expo->push_back(new Num(1));
 
         bool found = false;
-        for (int j = i+1; j < prod->subExpr.size(); j++) {
-            Expr* other = prod->subExpr[j];
+        for (int j = i+1; j < prod->size(); j++) {
+            Expr* other = prod->at(j);
 
             if (other->equalStruct(current)) {
-                expo->subExpr.push_back(new Num(1L));
-                prod->subExpr.erase(prod->subExpr.begin() + j);
+                expo->push_back(new Num(1L));
+                prod->erase(j);
                 j--;
                 found = true;
             } else if (dynamic_cast<Power*>(other)) {
                 Power* otherPower = dynamic_cast<Power*>(other);
 
                 if (otherPower->getBase()->equalStruct(current)) {
-                    expo->subExpr.push_back(otherPower->getExpo());
-                    prod->subExpr.erase(prod->subExpr.begin() + j);
+                    expo->push_back(otherPower->getExpo());
+                    prod->erase(j);
                     j--;
                     found = true;
                 }
@@ -95,7 +96,7 @@ void Prod::multiplyLikeTerms(Prod* prod) {
 
         if (found) {
             expo = expo->simplify();
-            prod->subExpr[i] = new Power(current, expo);
+            prod->set(i, new Power(current, expo));
         }
         
     }
@@ -103,10 +104,10 @@ void Prod::multiplyLikeTerms(Prod* prod) {
 
 Expr* Prod::alone(Prod* prod) {
     // if the product has only 1 element
-    if (prod->subExpr.size() == 1) {
-        return prod->subExpr[0];
+    if (prod->size() == 1) {
+        return prod->at(0);
     // if the product is empty, return 1
-    } else if (prod->subExpr.size() == 0) {
+    } else if (prod->size() == 0) {
         return new Num(1);
     }
     return prod;
@@ -115,8 +116,9 @@ Expr* Prod::alone(Prod* prod) {
 Expr* Prod::copy() {
     Expr* prodCopy = new Prod();
 
-    for (Expr* sub : subExpr) {
-        prodCopy->subExpr.push_back(sub->copy());
+    for (int i = 0; i < size(); i++) {
+        Expr* sub = at(i);
+        prodCopy->push_back(sub->copy());
     }
 
     return prodCopy;
@@ -127,9 +129,9 @@ bool Prod::equalStruct(Expr* other) {
     Prod* otherProd = (Prod*)other;
 
     if (otherProd) {
-        return this->subExpr.size() == otherProd->subExpr.size() &&
-               this->subExpr[0]->equalStruct(otherProd->subExpr[0]) &&
-               this->subExpr[1]->equalStruct(otherProd->subExpr[1]);
+        return this->size() == otherProd->size() &&
+               this->at(0)->equalStruct(otherProd->at(0)) &&
+               this->at(1)->equalStruct(otherProd->at(1));
     }
 
     return false;
@@ -140,13 +142,13 @@ std::string Prod::getLatex() {
     std::vector<Var*> vars;
     std::string latex = "";
 
-    for (int i = 0; i < subExpr.size(); i++) {
-        if (dynamic_cast<Var*>(subExpr[i])) vars.push_back(dynamic_cast<Var*>(subExpr[i]));
-        else if (dynamic_cast<Num*>(subExpr[i])) nums.push_back(dynamic_cast<Num*>(subExpr[i]));
+    for (int i = 0; i < size(); i++) {
+        if (dynamic_cast<Var*>(at(i))) vars.push_back(dynamic_cast<Var*>(at(i)));
+        else if (dynamic_cast<Num*>(at(i))) nums.push_back(dynamic_cast<Num*>(at(i)));
     }
 
     // Special ordering for single coefficients on variables
-    if (vars.size() == 1 && nums.size() == 1 && subExpr.size() == 2) {
+    if (vars.size() == 1 && nums.size() == 1 && size() == 2) {
         for (Num* num : nums) {
             latex.append(num->getLatex());
         }
@@ -154,9 +156,9 @@ std::string Prod::getLatex() {
             latex.append(var->getLatex());
         }
     } else {
-        for (int i = 0; i < subExpr.size(); i++) {
-            latex.append(subExpr[i]->getLatex());
-            if (i != (subExpr.size()-1))
+        for (int i = 0; i < size(); i++) {
+            latex.append(at(i)->getLatex());
+            if (i != (size()-1))
                 latex.append(LATEX_MULTIPLICATION_SIGN);
         }
     }
@@ -165,9 +167,9 @@ std::string Prod::getLatex() {
 }
 
 void Prod::print() {
-    for (int i = 0; i < subExpr.size(); i++) {
-        subExpr[i]->print();
-        if (i != (subExpr.size()-1))
+    for (int i = 0; i < size(); i++) {
+        at(i)->print();
+        if (i != (size()-1))
             std::cout << "*";
     }
 }

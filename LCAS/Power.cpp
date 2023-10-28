@@ -12,15 +12,15 @@
 #include "Sum.hpp"
 #include "Prod.hpp"
 
-void Power::setBase(Expr* base) { subExpr[0] = base; }
-void Power::setExpo(Expr* expo) { subExpr[1] = expo; }
+void Power::setBase(Expr* base) { set(0, base); }
+void Power::setExpo(Expr* expo) { set(1, expo); }
 
-Expr* Power::getBase() { return subExpr[0]; }
-Expr* Power::getExpo() { return subExpr[1]; }
+Expr* Power::getBase() { return at(0); }
+Expr* Power::getExpo() { return at(1); }
 
 Power::Power (Expr* base, Expr* expo) {
-    subExpr.push_back(base);
-    subExpr.push_back(expo);
+    push_back(base);
+    push_back(expo);
 }
 
 Expr* Power::simplify() {
